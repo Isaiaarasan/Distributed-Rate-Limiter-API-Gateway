@@ -47,7 +47,7 @@ public class RateLimitPolicy {
     @Column(name = "bucket_capacity")
     private Integer bucketCapacity;
 
-    @Column(name = "refill_rate")
+    @Column(name = "refill_rate", columnDefinition = "DECIMAL(10,4)")
     private Double refillRate;
 
     @Column(name = "max_requests")

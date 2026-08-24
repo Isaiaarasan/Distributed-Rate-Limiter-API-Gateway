@@ -37,7 +37,7 @@ RateLimitGatewayFilter (GlobalFilter)
 
 Before running, install these on Windows:
 
-### 1. Java 22
+### 1. Java 21 LTS
 Download from: https://adoptium.net/
 Verify: `java -version`
 
