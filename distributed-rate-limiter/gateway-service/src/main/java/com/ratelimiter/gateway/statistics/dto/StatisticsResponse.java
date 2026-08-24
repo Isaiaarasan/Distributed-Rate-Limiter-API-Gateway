@@ -5,9 +5,6 @@ import lombok.Builder;
 
 import java.util.Map;
 
-/**
- * Response DTO for the statistics dashboard.
- */
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record StatisticsResponse(
