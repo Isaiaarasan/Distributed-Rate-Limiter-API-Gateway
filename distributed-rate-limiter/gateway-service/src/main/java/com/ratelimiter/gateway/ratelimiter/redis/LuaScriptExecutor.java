@@ -16,30 +16,29 @@ import java.util.List;
 public class LuaScriptExecutor {
 
     private final StringRedisTemplate redisTemplate;
-    private final DefaultRedisScript<List> tokenBucketScript;
-    private final DefaultRedisScript<List> slidingWindowScript;
+    private final DefaultRedisScript<List<Long>> tokenBucketScript;
+    private final DefaultRedisScript<List<Long>> slidingWindowScript;
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings("unchecked")
     public LuaScriptExecutor(StringRedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
 
         this.tokenBucketScript = new DefaultRedisScript<>();
         this.tokenBucketScript.setScriptSource(
                 new ResourceScriptSource(new ClassPathResource("scripts/token_bucket.lua")));
-        this.tokenBucketScript.setResultType(List.class);
+        this.tokenBucketScript.setResultType((Class<List<Long>>) (Class<?>) List.class);
 
         this.slidingWindowScript = new DefaultRedisScript<>();
         this.slidingWindowScript.setScriptSource(
                 new ResourceScriptSource(new ClassPathResource("scripts/sliding_window.lua")));
-        this.slidingWindowScript.setResultType(List.class);
+        this.slidingWindowScript.setResultType((Class<List<Long>>) (Class<?>) List.class);
 
         log.info("Lua scripts loaded: token_bucket.lua, sliding_window.lua");
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public Mono<long[]> executeTokenBucket(String key, long capacity, double refillRate, long now) {
         return Mono.fromCallable(() -> {
-            List<Long> result = (List<Long>) redisTemplate.execute(
+            List<Long> result = redisTemplate.execute(
                     tokenBucketScript,
                     List.of(key),
                     String.valueOf(capacity),
@@ -62,11 +61,10 @@ public class LuaScriptExecutor {
         });
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public Mono<long[]> executeSlidingWindow(String key, long maxRequests, long windowSeconds,
                                               long now, String requestId) {
         return Mono.fromCallable(() -> {
-            List<Long> result = (List<Long>) redisTemplate.execute(
+            List<Long> result = redisTemplate.execute(
                     slidingWindowScript,
                     List.of(key),
                     String.valueOf(maxRequests),

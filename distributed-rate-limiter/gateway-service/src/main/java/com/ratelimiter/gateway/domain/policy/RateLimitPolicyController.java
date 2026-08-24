@@ -83,6 +83,6 @@ public class RateLimitPolicyController {
     @Operation(summary = "Delete a rate limit policy", description = "After deletion, the client+API pair is no longer rate-limited.")
     public Mono<ResponseEntity<ApiResponse<Void>>> deletePolicy(@PathVariable Long id) {
         return policyService.deletePolicy(id)
-                .then(Mono.just(ResponseEntity.ok(ApiResponse.<Void>success("Rate limit policy deleted."))));
+                .then(Mono.just(ResponseEntity.ok(ApiResponse.success("Rate limit policy deleted."))));
     }
 }

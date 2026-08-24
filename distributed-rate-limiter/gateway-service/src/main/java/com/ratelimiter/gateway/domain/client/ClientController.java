@@ -77,6 +77,6 @@ public class ClientController {
     @Operation(summary = "Delete a client", description = "Permanently deletes a client and all their rate limit policies.")
     public Mono<ResponseEntity<ApiResponse<Void>>> deleteClient(@PathVariable Long id) {
         return clientService.deleteClient(id)
-                .then(Mono.just(ResponseEntity.ok(ApiResponse.<Void>success("Client deleted."))));
+                .then(Mono.just(ResponseEntity.ok(ApiResponse.success("Client deleted."))));
     }
 }

@@ -25,13 +25,13 @@ RateLimitGatewayFilter (GlobalFilter)
 
 | Layer | Technology |
 |-------|-----------|
-| Language | Java 22 |
+| Language | Java 21 LTS |
 | Gateway | Spring Cloud Gateway 4.x (WebFlux/Reactive) |
 | Database | MySQL 8.x + Spring Data JPA + Flyway |
 | Distributed State | Redis 7.x + Lua scripts (atomic) |
 | Cache | Caffeine (in-process) |
 | API Docs | SpringDoc OpenAPI 3 (Swagger UI) |
-| Build | Maven 3.9+ |
+| Build | Maven 3.9+ / Maven Wrapper (`mvnw`) |
 
 ## Prerequisites
 
@@ -71,48 +71,37 @@ spring:
 
 ### Step 2: Build the entire project
 ```powershell
-cd "i:\Projects\API MONITOR\distributed-rate-limiter"
-mvn clean install -DskipTests
+cd "I:\Projects\API MONITOR\Distributed Rate Limiter & API Gateway\distributed-rate-limiter"
+.\mvnw clean install -DskipTests
 ```
 
-### Step 3: Start Redis
-```powershell
-# If Redis is installed natively:
-redis-server
+### Step 3: Start Redis & MySQL
+Ensure Redis (`localhost:6379`) and MySQL (`localhost:3306`) are running.
 
-# If using WSL:
-wsl redis-server
-```
-
-### Step 4: Start MySQL and ensure it's running
-```powershell
-net start mysql80
-```
-
-### Step 5: Start the mock backend services (3 separate terminals)
+### Step 4: Start the mock backend services (3 separate terminals)
 
 **Terminal 1 — Product Service (port 8081):**
 ```powershell
-cd "i:\Projects\API MONITOR\distributed-rate-limiter\mock-services\product-service"
-mvn spring-boot:run
+cd "I:\Projects\API MONITOR\Distributed Rate Limiter & API Gateway\distributed-rate-limiter\mock-services\product-service"
+.\mvnw spring-boot:run
 ```
 
 **Terminal 2 — Order Service (port 8082):**
 ```powershell
-cd "i:\Projects\API MONITOR\distributed-rate-limiter\mock-services\order-service"
-mvn spring-boot:run
+cd "I:\Projects\API MONITOR\Distributed Rate Limiter & API Gateway\distributed-rate-limiter\mock-services\order-service"
+.\mvnw spring-boot:run
 ```
 
 **Terminal 3 — User Service (port 8083):**
 ```powershell
-cd "i:\Projects\API MONITOR\distributed-rate-limiter\mock-services\user-service"
-mvn spring-boot:run
+cd "I:\Projects\API MONITOR\Distributed Rate Limiter & API Gateway\distributed-rate-limiter\mock-services\user-service"
+.\mvnw spring-boot:run
 ```
 
-### Step 6: Start the API Gateway (port 8080)
+### Step 5: Start the API Gateway (port 8080)
 ```powershell
-cd "i:\Projects\API MONITOR\distributed-rate-limiter\gateway-service"
-mvn spring-boot:run
+cd "I:\Projects\API MONITOR\Distributed Rate Limiter & API Gateway\distributed-rate-limiter\gateway-service"
+.\mvnw spring-boot:run
 ```
 
 **On startup, Flyway automatically creates:**

@@ -69,6 +69,6 @@ public class ApiEndpointController {
     @Operation(summary = "Delete an API endpoint", description = "Deletes the endpoint and all associated rate limit policies.")
     public Mono<ResponseEntity<ApiResponse<Void>>> deleteEndpoint(@PathVariable Long id) {
         return apiEndpointService.deleteEndpoint(id)
-                .then(Mono.just(ResponseEntity.ok(ApiResponse.<Void>success("API endpoint deleted."))));
+                .then(Mono.just(ResponseEntity.ok(ApiResponse.success("API endpoint deleted."))));
     }
 }

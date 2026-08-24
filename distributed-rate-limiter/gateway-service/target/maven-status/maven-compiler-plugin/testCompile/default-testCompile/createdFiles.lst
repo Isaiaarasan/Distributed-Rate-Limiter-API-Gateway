@@ -1,0 +1,4 @@
+com\ratelimiter\gateway\common\util\HashUtilTest.class
+com\ratelimiter\gateway\ratelimiter\RateLimiterFactoryTest.class
+com\ratelimiter\gateway\ratelimiter\slidingwindow\SlidingWindowRateLimiterTest.class
+com\ratelimiter\gateway\ratelimiter\tokenbucket\TokenBucketRateLimiterTest.class
