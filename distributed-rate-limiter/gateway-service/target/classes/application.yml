@@ -1,0 +1,134 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+
+  # ── CRITICAL: Force reactive web application (Spring Cloud Gateway requires WebFlux) ──
+  main:
+    web-application-type: reactive
+
+  # ── MySQL Database ────────────────────────────────────────────────────────────
+  datasource:
+    url: jdbc:mysql://localhost:3306/rate_limiter_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: root          # ← CHANGE THIS to your MySQL root password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+
+  # ── JPA / Hibernate ───────────────────────────────────────────────────────────
+  jpa:
+    hibernate:
+      ddl-auto: validate      # Flyway manages schema; Hibernate only validates
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+
+  # ── Flyway (auto SQL migration) ───────────────────────────────────────────────
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
+
+  # ── Redis ─────────────────────────────────────────────────────────────────────
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:               # Leave blank if Redis has no password (default local setup)
+      database: 0
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 2
+          max-wait: 1000ms
+
+  # ── Spring Cloud Gateway Routes ───────────────────────────────────────────────
+  # These routes define where the gateway forwards requests AFTER they pass rate limiting.
+  # The gateway filter intercepts ALL paths below before forwarding.
+  cloud:
+    gateway:
+      routes:
+        - id: product-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/products/**
+        - id: order-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/orders/**
+        - id: user-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/users/**
+
+      # Global response headers added to all proxied responses
+      default-filters:
+        - AddResponseHeader=X-Powered-By, Distributed-Rate-Limiter-Gateway
+
+      # Disable default Spring Cloud Gateway rate limiter (we use our own)
+      redis-rate-limiter:
+        include-headers: false
+
+  # ── Jackson ────────────────────────────────────────────────────────────────────
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+# ── SpringDoc OpenAPI ─────────────────────────────────────────────────────────────
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    display-request-duration: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+  show-actuator: false
+
+# ── Actuator ──────────────────────────────────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Distributed Rate Limiter
+    version: 1.0.0
+    description: API Gateway with Token Bucket and Sliding Window rate limiting
+
+# ── Logging ────────────────────────────────────────────────────────────────────
+logging:
+  level:
+    com.ratelimiter: DEBUG
+    org.springframework.cloud.gateway: INFO
+    org.springframework.data.redis: INFO
+    org.flywaydb: INFO
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
